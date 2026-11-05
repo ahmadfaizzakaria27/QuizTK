@@ -1,0 +1,429 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kuis Konsumsi Islami</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&display=swap">
+<style>
+/* Layout: satu layar penuh untuk proyektor. Header tipis, panggung soal/pilihan besar, papan skor di bawah. */
+:root{
+  --bg:#ffffff;
+  --ink:#0d1b2a;
+  --muted:#42536a;
+  --panel:#e8edf3;
+  --amber:#ffc21a;
+  --good:#0b7a3e;
+  --good-bg:#d6f3e1;
+  --bad:#c4271c;
+  --bad-bg:#fde1de;
+  --f:'Archivo',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.2;overflow:hidden}
+*{box-sizing:border-box}
+button{font-family:inherit;color:inherit;cursor:pointer}
+input{font-family:inherit}
+:focus-visible{outline:4px solid var(--amber);outline-offset:2px}
+#app{height:100%;display:grid;grid-template-rows:auto auto 1fr auto;gap:0;
+  padding-left:max(clamp(16px,1.6vw,40px),env(safe-area-inset-left,0px));
+  padding-right:max(clamp(16px,1.6vw,40px),env(safe-area-inset-right,0px));
+  padding-block:clamp(8px,1vw,20px)}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:1vw;background:var(--ink);color:#fff;border-radius:.6vw .6vw 0 0;padding:.5vw 1.2vw;min-height:clamp(44px,5vw,90px)}
+.no{font-weight:900;font-size:clamp(20px,2.8vw,54px);letter-spacing:.02em}
+.no span{opacity:.6;font-weight:700}
+.mid{font-weight:900;font-size:clamp(16px,2vw,38px);background:var(--amber);color:var(--ink);padding:.15em .6em;border-radius:.3em}
+.mid:empty{display:none}
+.rt{display:flex;align-items:center;gap:1vw}
+.timer{font-weight:900;font-size:clamp(28px,4.4vw,84px);font-variant-numeric:tabular-nums;min-width:2.2ch;text-align:right}
+.ghost{background:transparent;border:2px solid rgba(255,255,255,.55);color:#fff;border-radius:.4vw;padding:.35em .8em;font-weight:700;font-size:clamp(12px,1.2vw,22px)}
+.ghost.on{background:var(--amber);color:var(--ink);border-color:var(--amber)}
+.cta{background:var(--amber);color:var(--ink);border:0;border-radius:.5vw;font-weight:900;font-size:clamp(18px,2.4vw,46px);padding:.5em 1.1em}
+.cta.sm{font-size:clamp(14px,1.6vw,30px);padding:.35em .9em}
+.bar{height:clamp(8px,.9vw,16px);background:var(--panel)}
+.bar i{display:block;height:100%;width:100%;background:var(--ink)}
+.bar i.warn{background:var(--bad)}
+.stage{min-height:0;display:grid;grid-template-rows:auto 1fr;gap:1vw;padding:1.2vw 0;overflow:hidden}
+.stage.solo{grid-template-rows:1fr}
+.center{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2vw;text-align:center}
+.big{font-weight:900;font-size:clamp(44px,9vw,180px);line-height:1}
+.center p{margin:0;font-size:clamp(18px,2.4vw,44px);color:var(--muted);font-weight:700;max-width:30ch}
+.qbox{min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:0 1vw}
+.qtext{font-weight:900;line-height:1.12;text-align:center;text-wrap:balance;width:100%}
+.prompt{font-weight:900;font-size:clamp(14px,1.9vw,36px);padding:.3em .8em;border-radius:.4vw;background:var(--panel);text-align:center}
+.prompt.need{background:var(--amber)}
+.banner{display:flex;align-items:center;justify-content:space-between;gap:1.4vw;border-radius:.5vw;padding:.6vw 1.4vw}
+.banner.ok{background:var(--good-bg);color:var(--good)}
+.banner.bad{background:var(--bad-bg);color:var(--bad)}
+.banner h2{margin:0;font-size:clamp(22px,3.4vw,66px);font-weight:900}
+.banner p{margin:.2em 0 0;color:var(--ink);font-weight:500;font-size:clamp(13px,1.45vw,28px);line-height:1.25}
+.opts{min-height:0;display:flex;flex-direction:column;justify-content:space-evenly;gap:.8vw;overflow:hidden;font-size:var(--of,32px)}
+.opt{flex:none;display:flex;align-items:center;gap:.6em;text-align:left;width:100%;background:#fff;border:.25vw solid var(--ink);border-radius:.5vw;padding:.3em .6em;font-size:1em;font-weight:700;line-height:1.15}
+.opt b{flex:none;display:grid;place-items:center;width:1.5em;height:1.5em;background:var(--ink);color:#fff;border-radius:.25em;font-weight:900}
+.opt.x{opacity:.4;text-decoration:line-through;background:var(--panel);border-color:var(--bad)}
+.opt.x b{background:var(--bad)}
+.opt.dim{opacity:.4}
+.opt.right{background:var(--good-bg);border-color:var(--good);border-width:.45vw;opacity:1}
+.opt.right b{background:var(--good)}
+.opt:disabled{cursor:default}
+.flash{background:var(--bad-bg);border-radius:.6vw;color:var(--bad);align-items:center;justify-content:center}
+.flash .big{font-size:clamp(48px,11vw,220px)}
+.scores{display:flex;flex-wrap:wrap;gap:.8vw;border-top:.25vw solid var(--ink);padding-top:.9vw}
+.team{flex:1 1 13vw;min-width:min(100%,140px);display:flex;flex-direction:column;gap:.1em;background:var(--panel);border:.3vw solid transparent;border-radius:.6vw;padding:.5vw 1vw;text-align:left}
+.team .nm{font-weight:700;font-size:clamp(14px,1.8vw,34px);overflow-wrap:anywhere}
+.team .sc{font-weight:900;font-size:clamp(26px,3.6vw,70px);font-variant-numeric:tabular-nums;line-height:1}
+.team .tg{font-size:clamp(11px,1.1vw,20px);font-weight:700;color:var(--muted);min-height:1.2em}
+.team.pick{cursor:pointer;border-color:var(--ink);background:#fff}
+.team.sel{background:var(--amber);border-color:var(--ink)}
+.team.used{opacity:.45}
+.adj{display:flex;gap:.4vw;margin-top:.3vw}
+.adj button{font-weight:900;font-size:clamp(12px,1.3vw,24px);border:2px solid var(--ink);background:#fff;border-radius:.3vw;padding:.1em .6em}
+/* setup + end */
+.page{grid-row:1 / -1;display:flex;flex-direction:column;gap:1.6vw;overflow:auto;padding:1vw 0;min-height:0}
+.page h1{margin:0;font-size:clamp(30px,5vw,96px);font-weight:900;line-height:1}
+.page .sub{margin:0;font-size:clamp(15px,1.7vw,32px);color:var(--muted);font-weight:700}
+.rules{display:flex;flex-wrap:wrap;gap:.8vw}
+.rules span{font-weight:900;font-size:clamp(14px,1.7vw,32px);background:var(--panel);border-radius:.4vw;padding:.3em .8em}
+.rules .p{background:var(--good-bg);color:var(--good)}
+.rules .m{background:var(--bad-bg);color:var(--bad)}
+.tl{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:.8vw}
+.tl div{display:flex;gap:.5vw}
+.tl input{flex:1;min-width:0;font-weight:700;font-size:clamp(16px,1.8vw,34px);border:.2vw solid var(--ink);border-radius:.4vw;padding:.35em .6em;background:#fff;color:var(--ink)}
+.tl button{border:.2vw solid var(--ink);background:#fff;border-radius:.4vw;font-weight:900;font-size:clamp(16px,1.8vw,34px);padding:0 .7em}
+.row{display:flex;flex-wrap:wrap;gap:1vw;align-items:center}
+.out{background:#fff;border:.2vw solid var(--ink);border-radius:.5vw;font-weight:900;font-size:clamp(14px,1.6vw,30px);padding:.5em 1em}
+.hint{font-size:clamp(12px,1.1vw,20px);color:var(--muted);font-weight:500}
+.rank{display:flex;flex-direction:column;gap:.8vw}
+.rk{display:flex;align-items:center;gap:1.4vw;border:.25vw solid var(--ink);border-radius:.6vw;padding:.7vw 1.4vw;font-weight:900}
+.rk.w{background:var(--amber)}
+.rk .n{font-size:clamp(26px,4vw,76px);min-width:1.2ch}
+.rk .t{flex:1;font-size:clamp(20px,3vw,58px);overflow-wrap:anywhere}
+.rk .j{font-size:clamp(14px,1.8vw,34px)}
+.rk .s{font-size:clamp(26px,4vw,76px);font-variant-numeric:tabular-nums}
+.warn-note{background:var(--bad-bg);color:var(--bad);font-weight:900;border-radius:.5vw;padding:.6em 1em;font-size:clamp(14px,1.7vw,32px)}
+@media (max-width:700px){
+  .hd{flex-wrap:wrap}
+  .opt{border-width:2px}
+  .team{flex:1 1 40%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<div id="app"></div>
+<script>
+const Q=[
+{q:"Tiga asumsi “sempurna” pada homo economicus adalah...",
+ o:["Perfect self-interest, perfect rationality, perfect competition",
+    "Perfect self-interest, perfect altruism, perfect information",
+    "Perfect self-interest, perfect rationality, perfect information",
+    "Perfect rationality, perfect information, perfect equality",
+    "Perfect competition, perfect information, perfect rationality"],
+ a:2,w:"Slide 6: self-interest (kepentingan diri), rationality (rasionalitas), dan information (informasi)."},
+{q:"Saat haus, es teh gelas pertama sangat nikmat, tetapi gelas keempat mungkin sudah tidak diinginkan. Ini menggambarkan...",
+ o:["Utilitas marginal menurun: tambahan kepuasan tiap gelas makin kecil",
+    "Total kepuasan langsung turun sejak gelas kedua",
+    "Tambahan kepuasan tiap gelas selalu sama selama masih haus",
+    "Kepuasan makin besar karena konsumen makin terbiasa",
+    "Gelas pertama dan gelas terakhir memberi kepuasan yang sama"],
+ a:0,w:"Slide 7: yang menurun adalah tambahan kepuasan (utilitas marginal), bukan otomatis total kepuasan."},
+{q:"Pada model kurva indiferen dan garis anggaran, titik keseimbangan E adalah...",
+ o:["Kurva tertinggi (U3), karena kepuasannya paling besar",
+    "Titik potong garis anggaran dengan sumbu Barang Y",
+    "Kurva terendah (U1) yang menyentuh garis anggaran",
+    "Titik saat kurva indiferen memotong garis anggaran di dua tempat",
+    "Kurva tertinggi yang masih bersinggungan dengan garis anggaran (U2)"],
+ a:4,w:"Slide 8: E = kurva indiferen tertinggi yang terjangkau anggaran. U3 lebih memuaskan tetapi tidak terjangkau."},
+{q:"Pernyataan manakah yang paling tepat tentang halal dan thayyib?",
+ o:["Makanan yang halal pasti thayyib bagi semua orang",
+    "Makanan halal yang tinggi gula bisa tidak thayyib bagi penderita diabetes",
+    "Thayyib hanya soal cara memperoleh, halal hanya soal zatnya",
+    "QS Al-Baqarah 168 ditujukan khusus kepada orang beriman",
+    "Barang haram tetap bernilai ekonomi selama ada yang membelinya"],
+ a:1,w:"Slide 10: halal saja belum cukup. Ayat 168 ditujukan kepada seluruh manusia, dan barang haram kehilangan nilai ekonomi."},
+{q:"Manakah pembeda yang paling tepat antara israf dan tabdzir?",
+ o:["Israf menilai arah pembelanjaan, tabdzir menilai kadar konsumsi",
+    "Israf hanya berlaku untuk makanan, tabdzir hanya untuk uang",
+    "Israf hukumnya haram, tabdzir hukumnya hanya makruh",
+    "Israf soal kadar pada yang halal, tabdzir soal arah belanja yang tidak benar atau sia-sia",
+    "Keduanya sinonim yang maknanya persis sama"],
+ a:3,w:"Slide 11: israf = kadar (berlebihan pada yang halal). Tabdzir = arah (untuk hal tidak benar atau sia-sia)."},
+{q:"Menurut Al-Ghazali, batas konsumsi yang dianjurkan bagi seorang Muslim adalah...",
+ o:["Had al-hajah (batas kebutuhan)",
+    "Had ad-dharurah (batas darurat)",
+    "Had at-tana‘um (batas bermewah-mewah)",
+    "Qatr (menahan hak demi berhemat)",
+    "Had ad-dharurah dan had at-tana‘um secara bergantian"],
+ a:0,w:"Slide 12: had al-hajah. Hidup terus di batas darurat mengganggu ibadah, bermewah-mewah tidak cocok bagi Muslim."},
+{q:"Manakah yang BUKAN salah satu dari lima prinsip konsumsi menurut M. A. Mannan?",
+ o:["Keadilan","Kebersihan","Kesederhanaan","Kemandirian","Moralitas"],
+ a:3,w:"Slide 13: keadilan, kebersihan, kesederhanaan, kemurahan hati, dan moralitas."},
+{q:"Dewi sedang sakit dan butuh obat pahit, tetapi ia sama sekali tidak ingin meminumnya. Menurut matriks Fahim Khan, sikap konsumen yang berakal sehat adalah...",
+ o:["Abaikan, karena ia tidak menginginkannya",
+    "Kendalikan, karena termasuk keinginan yang berlebihan",
+    "Tetap penuhi, karena dibutuhkan walau tidak diinginkan",
+    "Tunda sampai ia benar-benar menginginkannya",
+    "Penuhi hanya bila harga obatnya murah"],
+ a:2,w:"Slide 15: dibutuhkan tetapi tidak diinginkan, maka tetap dipenuhi (obat pahit, periksa kesehatan)."},
+{q:"Menurut Asy-Syathibi, pernyataan yang BENAR tentang tingkat kebutuhan adalah...",
+ o:["Dharuriyyat: jika tidak terpenuhi, hidup hanya terasa kurang pantas",
+    "Tahsiniyyat: wajib segera dipenuhi demi menjaga lima pokok kehidupan",
+    "Hajiyyat: jika tidak terpenuhi, kehidupan terancam rusak",
+    "Israf: tingkat keempat, yaitu kemewahan di atas tahsiniyyat",
+    "Hajiyyat: jika tidak terpenuhi, hidup sulit dan sempit tetapi tidak terancam"],
+ a:4,w:"Slide 16: hajiyyat = pemudah. Kemewahan berlebihan bukan tingkat keempat, tetapi sudah keluar dari kebutuhan (israf)."},
+{q:"Seorang nasabah merasa bunga bank sangat menguntungkannya. Menurut sifat mashlahah, bagaimana penilaiannya?",
+ o:["Termasuk mashlahah, sebab mashlahah sepenuhnya diserahkan pada penilaian pribadi",
+    "Bukan mashlahah, sebab mashlahah itu subjektif tetapi caranya ditetapkan syariah",
+    "Termasuk mashlahah, asalkan sebagian bunganya disedekahkan",
+    "Mashlahah duniawi saja, tetapi tidak bernilai di akhirat",
+    "Belum bisa ditentukan sampai ada penilaian dari masyarakat"],
+ a:1,w:"Slide 19: mashlahah subjektif tetapi terikat syariah. Bunga bank yang dianggap menguntungkan tetap haram."},
+{q:"Seorang perokok merasa sangat puas (utilitasnya naik), padahal orang di sekitarnya terganggu. Analisis yang paling tepat?",
+ o:["Mashlahahnya naik, karena kepuasan subjektif perokok terpenuhi",
+    "Utilitas dan mashlahah sama-sama turun, karena ada pihak yang dirugikan",
+    "Utilitas boleh bertentangan dengan sosial, mashlahah tidak: konsumsi ini bukan mashlahah",
+    "Mashlahah tetap tercapai selama perokok menyedekahkan sebagian uang rokoknya",
+    "Tidak bisa dinilai, sebab mashlahah sama sulit diukurnya dengan utilitas"],
+ a:2,w:"Slide 20: utilitas individu dan sosial bisa bertentangan, sedangkan mashlahah konsisten antara keduanya."},
+{q:"Pendapatan Rp10 juta: konsumsi duniawi (Cw) Rp6 juta dan tabungan (S) Rp1,5 juta. Berapa belanja di jalan Allah (Ci) dan belanja akhir (final spending)?",
+ o:["Ci Rp2,5 juta; belanja akhir Rp8,5 juta",
+    "Ci Rp2,5 juta; belanja akhir Rp4 juta",
+    "Ci Rp4 juta; belanja akhir Rp10 juta",
+    "Ci Rp1,5 juta; belanja akhir Rp7,5 juta",
+    "Ci Rp2,5 juta; belanja akhir Rp10 juta"],
+ a:0,w:"Slide 22: Y = Cw + Ci + S, jadi Ci = 10 − 6 − 1,5 = 2,5. Belanja akhir = Cw + Ci = 8,5 juta (tabungan tidak dihitung)."},
+{q:"Sinta punya Rp100.000. Pilihannya: (1) buku kuliah halal, (2) makan bergizi halal, (3) taruhan judi daring. Menurut konsep ikhtiyar, mana yang benar tentang biaya peluang?",
+ o:["Ada pada ketiganya, sebab semua pilihan bisa dihitung untung-ruginya",
+    "Terbesar pada judi, sebab potensi kemenangannya hilang bila ditinggalkan",
+    "Tidak ada sama sekali, sebab ikhtiyar meniadakan semua pilihan dan perhitungan",
+    "Baru ada bila uang yang tersisa sudah disedekahkan lebih dulu",
+    "Hanya antara (1) dan (2). Meninggalkan judi tak punya biaya peluang, karena yang baik satu-satunya pilihan"],
+ a:4,w:"Slide 26: antara yang baik dan buruk tidak ada biaya peluang. Biaya peluang hanya di antara pilihan yang sama-sama baik."},
+{q:"Raka punya Rp500.000. Ia ingin membeli sepatu bermerek (tahsiniyyat), tetapi uang itu juga dibutuhkan untuk biaya berobat ibunya (dharuriyyat). Keputusan yang tepat menurut aturan prioritas?",
+ o:["Beli sepatu, lalu menutup biaya berobat dengan paylater berbunga",
+    "Beli sepatu, karena uang itu halal dan milik Raka sendiri",
+    "Bagi dua sama rata, karena keduanya sama-sama kebutuhan",
+    "Dahulukan biaya berobat; sepatu ditunda karena tahsiniyyat tak boleh mengorbankan dharuriyyat",
+    "Beli sepatu dulu, biaya berobat menyusul, karena hak diri sendiri lebih dulu"],
+ a:3,w:"Slide 25: dharuriyyat didahulukan. Hajiyyat dan tahsiniyyat tidak boleh dikejar dengan mengorbankan dharuriyyat, milik diri sendiri maupun orang lain."},
+{q:"Manakah pasangan pokok maqashid, tingkat, dan contoh yang BENAR menurut peta maqashid?",
+ o:["Akal – dharuriyyat: anjuran menuntut ilmu",
+    "Harta – hajiyyat: transaksi salam",
+    "Keturunan – tahsiniyyat: menyebut mahar saat akad",
+    "Agama – hajiyyat: kewajiban salat",
+    "Jiwa – tahsiniyyat: makanan pokok untuk bertahan hidup"],
+ a:1,w:"Slide 25: menuntut ilmu = hajiyyat, mahar = hajiyyat, salat = dharuriyyat, makanan pokok = dharuriyyat. Transaksi salam = hajiyyat (harta)."}
+];
+
+const L=['A','B','C','D','E'];
+const PTS={b1:10,b2:5,salah:-5};
+const T1=30,T2=15,KEY='kuis-konsumsi-islami';
+const app=document.getElementById('app');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let S={screen:'setup',teams:[1,2,3,4].map(n=>({name:'Kelompok '+n,score:0})),qi:0,phase:'ready',attempt:1,tried:[],crossed:[],sel:null,result:null,flash:null,edit:false};
+let saved=null;
+try{saved=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){saved=null}
+let tHandle=null,fHandle=null,deadline=0,tTotal=0;
+
+function save(nextQi){try{localStorage.setItem(KEY,JSON.stringify({teams:S.teams,nextQi:nextQi}));saved={teams:S.teams,nextQi:nextQi}}catch(e){}}
+function clearTimers(){clearInterval(tHandle);clearTimeout(fHandle);tHandle=null;fHandle=null}
+function resetQ(){clearTimers();Object.assign(S,{phase:'ready',attempt:1,tried:[],crossed:[],sel:null,result:null,flash:null})}
+
+function startTimer(sec,onEnd){
+  clearInterval(tHandle);tTotal=sec*1000;deadline=performance.now()+tTotal;
+  tHandle=setInterval(()=>{
+    const left=Math.max(0,deadline-performance.now());
+    updateTimerUI(left);
+    if(left<=0){clearInterval(tHandle);tHandle=null;onEnd()}
+  },100);
+}
+function updateTimerUI(left){
+  if(S.phase!=='reading')return;
+  if(left===undefined)left=Math.max(0,deadline-performance.now());
+  const n=document.getElementById('tnum'),b=document.getElementById('tbar');
+  if(n)n.textContent=Math.ceil(left/1000);
+  if(b){b.style.width=(left/tTotal*100)+'%';b.classList.toggle('warn',left<=5000)}
+}
+
+/* ---- aksi ---- */
+function startGame(resume){
+  S.teams=S.teams.map(t=>({name:(t.name||'').trim()||'Kelompok',score:0}));
+  S.qi=0;
+  if(resume&&saved){S.teams=saved.teams.map(t=>({name:t.name,score:t.score}));S.qi=saved.nextQi}
+  S.screen='play';S.edit=false;resetQ();render();
+}
+function begin(){
+  if(S.phase!=='ready')return;
+  S.phase='reading';render();
+  startTimer(S.attempt===1?T1:T2,toChoices);
+}
+function toChoices(){
+  if(S.phase!=='reading')return;
+  clearInterval(tHandle);S.phase='choices';render();
+}
+function pickTeam(i){
+  if(S.phase!=='choices'||S.tried.includes(i))return;
+  S.sel=(S.sel===i)?null:i;render();
+}
+function pick(oi){
+  if(S.phase!=='choices'||S.sel===null||S.crossed.includes(oi))return;
+  const q=Q[S.qi],t=S.teams[S.sel];
+  if(oi===q.a){
+    const pts=S.attempt===1?PTS.b1:PTS.b2;
+    t.score+=pts;S.result={type:'ok',team:t.name,pts:pts,attempt:S.attempt};
+    S.phase='reveal';finishQ();render();
+  }else{
+    t.score+=PTS.salah;S.tried.push(S.sel);S.crossed.push(oi);
+    const nm=t.name;S.sel=null;
+    if(S.attempt===1||S.tried.length>=S.teams.length){
+      if(S.attempt===1&&S.tried.length<S.teams.length){
+        S.attempt=2;S.phase='flash';S.flash={team:nm};render();
+        fHandle=setTimeout(()=>{S.phase='reading';S.flash=null;render();startTimer(T2,toChoices)},2200);
+      }else{S.result={type:'hangus'};S.phase='reveal';finishQ();render()}
+    }else{
+      S.result={type:'hangus'};S.phase='reveal';finishQ();render();
+    }
+  }
+}
+function hangus(){
+  if(S.phase!=='choices'&&S.phase!=='reading')return;
+  clearTimers();S.result={type:'hangus'};S.phase='reveal';finishQ();render();
+}
+function finishQ(){save(S.qi+1)}
+function next(){
+  if(S.phase!=='reveal')return;
+  if(S.qi>=Q.length-1){S.screen='end';render();return}
+  S.qi++;resetQ();render();
+}
+function adj(i,d){S.teams[i].score+=d;save(S.phase==='reveal'?S.qi+1:S.qi);render()}
+
+/* ---- tampilan ---- */
+function setupHTML(){
+  const resume=saved&&saved.nextQi>0&&saved.nextQi<Q.length;
+  return `<div class="page">
+  <h1>Kuis Konsumsi Islami</h1>
+  <p class="sub">${Q.length} soal pilihan ganda. Tulis nama kelompok, lalu mulai.</p>
+  <div class="rules"><span class="p">Benar kesempatan 1: +10</span><span class="p">Benar kesempatan 2: +5</span><span class="m">Salah: −5</span></div>
+  <div class="tl">${S.teams.map((t,i)=>`<div><input id="tm${i}" data-name="${i}" value="${esc(t.name)}" aria-label="Nama kelompok ${i+1}" maxlength="24"><button data-act="rm" data-i="${i}" aria-label="Hapus kelompok ${i+1}" ${S.teams.length<=2?'disabled':''}>×</button></div>`).join('')}</div>
+  <div class="row"><button class="out" data-act="add">+ Tambah kelompok</button>
+  <button class="cta" data-act="start">Mulai kuis</button>
+  ${resume?`<button class="out" data-act="resume">Lanjutkan dari soal ${saved.nextQi+1}</button>`:''}</div>
+  <p class="hint">Pintasan: Spasi = lanjut, 1-9 = pilih kelompok, A-E = jawaban, H = hangus. Minimal 2 kelompok.</p>
+  </div>`;
+}
+function scoreHTML(){
+  const choose=S.phase==='choices';
+  return `<footer class="scores">${S.teams.map((t,i)=>{
+    const used=S.tried.includes(i);
+    const cls=['team'];
+    if(choose&&!used)cls.push('pick');
+    if(choose&&S.sel===i)cls.push('sel');
+    if(choose&&used)cls.push('used');
+    const tag=choose&&used?'sudah menjawab':(choose&&S.sel===i?'menjawab':(choose?'tekan ' +(i+1):''));
+    return `<div class="${cls.join(' ')}" ${choose&&!used?`data-act="team" data-i="${i}"`:''}>
+      <span class="nm">${esc(t.name)}</span><span class="sc">${t.score}</span><span class="tg">${tag}</span>
+      ${S.edit?`<span class="adj"><button data-act="adj" data-i="${i}" data-d="-5">−5</button><button data-act="adj" data-i="${i}" data-d="5">+5</button></span>`:''}</div>`}).join('')}</footer>`;
+}
+function optsHTML(reveal){
+  const q=Q[S.qi];
+  return `<div class="opts">${q.o.map((t,i)=>{
+    const c=['opt'];
+    if(S.crossed.includes(i))c.push('x');
+    if(reveal){if(i===q.a)c.push('right');else if(!S.crossed.includes(i))c.push('dim')}
+    return `<button class="${c.join(' ')}" data-act="pick" data-i="${i}" ${reveal||S.crossed.includes(i)?'disabled':''}><b>${L[i]}</b><span>${esc(t)}</span></button>`}).join('')}</div>`;
+}
+function playHTML(){
+  const q=Q[S.qi],ph=S.phase;
+  const badge=ph==='ready'?'':'Kesempatan '+S.attempt;
+  let right='';
+  if(ph==='reading')right=`<button class="ghost" data-act="skip">Lewati ▶</button><div class="timer" id="tnum">${S.attempt===1?T1:T2}</div>`;
+  else if(ph==='choices')right=`<button class="ghost" data-act="hangus">Hangus (H)</button>`;
+  else if(ph==='reveal')right=`<button class="cta sm" data-act="next">${S.qi>=Q.length-1?'Lihat hasil':'Soal berikut'} ▶</button>`;
+  right+=`<button class="ghost ${S.edit?'on':''}" data-act="edit">${S.edit?'Selesai koreksi':'Koreksi skor'}</button>`;
+  const head=`<header class="hd"><div class="no">SOAL ${S.qi+1}<span>/${Q.length}</span></div><div class="mid">${badge}</div><div class="rt">${right}</div></header>`;
+  const bar=ph==='reading'?`<div class="bar"><i id="tbar"></i></div>`:`<div class="bar"></div>`;
+  let stage='';
+  if(ph==='ready'){
+    stage=`<main class="stage solo center"><div class="big">Soal ${S.qi+1}</div><p>Soal tampil ${T1} detik, lalu pilihan jawaban muncul.</p><button class="cta" data-act="begin">Mulai soal (Spasi)</button></main>`;
+  }else if(ph==='reading'){
+    stage=`<main class="stage solo"><div class="qbox"><div class="qtext">${esc(q.q)}</div></div></main>`;
+  }else if(ph==='flash'){
+    stage=`<main class="stage solo"><div class="flash center" style="height:100%"><div class="big">SALAH!</div><p style="color:var(--bad)">${esc(S.flash.team)} −5. Kelompok lain boleh menjawab.</p></div></main>`;
+  }else if(ph==='choices'){
+    const who=S.sel===null?'Pilih kelompok yang menjawab (klik nama di bawah atau tekan angkanya)':'Menjawab: '+S.teams[S.sel].name+'. Tekan jawabannya.';
+    stage=`<main class="stage"><div class="prompt ${S.sel===null?'need':''}">${esc(who)}</div>${optsHTML(false)}</main>`;
+  }else{
+    const r=S.result,ans=L[q.a];
+    const ban=r.type==='ok'
+      ?`<div class="banner ok"><div><h2>BENAR! ${esc(r.team)} +${r.pts}</h2><p>${esc(q.w)}</p></div></div>`
+      :`<div class="banner bad"><div><h2>HANGUS. Jawaban: ${ans}</h2><p>${esc(q.w)}</p></div></div>`;
+    stage=`<main class="stage">${ban}${optsHTML(true)}</main>`;
+  }
+  return head+bar+stage+scoreHTML();
+}
+function endHTML(){
+  const arr=S.teams.map(t=>({...t}));
+  arr.forEach(t=>{t.rank=1+arr.filter(o=>o.score>t.score).length});
+  arr.sort((a,b)=>b.score-a.score);
+  const top=arr.filter(t=>t.rank<=2).length;
+  return `<div class="page">
+  <h1>Hasil akhir</h1>
+  ${top>2?`<div class="warn-note">Skor seri di posisi juara. Tambah satu soal penentu.</div>`:''}
+  <div class="rank">${arr.map(t=>`<div class="rk ${t.rank<=2?'w':''}"><span class="n">${t.rank}</span><span class="t">${esc(t.name)}</span>${t.rank<=2?`<span class="j">JUARA ${t.rank}</span>`:''}<span class="s">${t.score}</span></div>`).join('')}</div>
+  <div class="row"><button class="cta" data-act="again">Main lagi</button></div></div>`;
+}
+function render(){
+  app.innerHTML=S.screen==='setup'?setupHTML():S.screen==='end'?endHTML():playHTML();
+  requestAnimationFrame(()=>{fitAll();updateTimerUI()});
+}
+function fitAll(){
+  const qt=document.querySelector('.qtext');
+  if(qt){
+    const box=qt.parentElement;let s=Math.min(innerWidth*.07,innerHeight*.14,130);
+    qt.style.fontSize=s+'px';
+    while(qt.offsetHeight>box.clientHeight-4&&s>16){s-=3;qt.style.fontSize=s+'px'}
+  }
+  const op=document.querySelector('.opts');
+  if(op){
+    let s=Math.min(innerWidth*.036,innerHeight*.07,68);
+    op.style.setProperty('--of',s+'px');
+    while(op.scrollHeight>op.clientHeight+1&&s>13){s-=2;op.style.setProperty('--of',s+'px')}
+  }
+}
+addEventListener('resize',()=>{if(S.screen==='play')fitAll()});
+
+/* ---- input ---- */
+app.addEventListener('input',e=>{
+  const n=e.target.dataset&&e.target.dataset.name;
+  if(n!==undefined&&n!=='')S.teams[+n].name=e.target.value;
+});
+app.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el)return;
+  const a=el.dataset.act,i=+el.dataset.i;
+  if(a==='add'){if(S.teams.length<12){S.teams.push({name:'Kelompok '+(S.teams.length+1),score:0});render()}}
+  else if(a==='rm'){if(S.teams.length>2){S.teams.splice(i,1);render()}}
+  else if(a==='start')startGame(false);
+  else if(a==='resume')startGame(true);
+  else if(a==='begin')begin();
+  else if(a==='skip')toChoices();
+  else if(a==='team')pickTeam(i);
+  else if(a==='pick')pick(i);
+  else if(a==='hangus')hangus();
+  else if(a==='next')next();
+  else if(a==='edit'){S.edit=!S.edit;render()}
+  else if(a==='adj')adj(i,+el.dataset.d);
+  else if(a==='again'){clearTimers();S.teams=S.teams.map(t=>({name:t.name,score:0}));S.screen='setup';try{localStorage.removeItem(KEY)}catch(x){}saved=null;render()}
+});
+addEventListener('keydown',e=>{
+  if(S.screen!=='play'||e.target.tagName==='INPUT'||e.ctrlKey||e.metaKey||e.altKey)return;
+  const k=e.key.toLowerCase();
+  if(k===' '||k==='enter'){
+    if(e.target.tagName==='BUTTON'&&k==='enter')return;
+    e.preventDefault();
+    if(S.phase==='ready')begin();else if(S.phase==='reading')toChoices();else if(S.phase==='reveal')next();
+  }else if(/^[1-9]$/.test(k)){if(+k<=S.teams.length)pickTeam(+k-1)}
+  else if('abcde'.includes(k)&&k.length===1)pick('abcde'.indexOf(k));
+  else if(k==='h')hangus();
+});
+render();
+</script>
+
+</body></html>
