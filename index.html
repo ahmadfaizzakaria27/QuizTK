@@ -48,7 +48,7 @@ input{font-family:inherit}
 .center p{margin:0;font-size:clamp(18px,2.4vw,44px);color:var(--muted);font-weight:700;max-width:30ch}
 .qbox{min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:0 1vw}
 .qtext{font-weight:900;line-height:1.12;text-align:center;text-wrap:balance;width:100%}
-.prompt{font-weight:900;font-size:clamp(14px,1.9vw,36px);padding:.3em .8em;border-radius:.4vw;background:var(--panel);text-align:center}
+.prompt{font-weight:900;font-size:clamp(13px,1.5vw,28px);padding:.25em .8em;border-radius:.4vw;background:var(--panel);text-align:center}
 .prompt.need{background:var(--amber)}
 .banner{display:flex;align-items:center;justify-content:space-between;gap:1.4vw;border-radius:.5vw;padding:.6vw 1.4vw}
 .banner.ok{background:var(--good-bg);color:var(--good)}
@@ -66,11 +66,11 @@ input{font-family:inherit}
 .opt:disabled{cursor:default}
 .flash{background:var(--bad-bg);border-radius:.6vw;color:var(--bad);align-items:center;justify-content:center}
 .flash .big{font-size:clamp(48px,11vw,220px)}
-.scores{display:flex;flex-wrap:wrap;gap:.8vw;border-top:.25vw solid var(--ink);padding-top:.9vw}
-.team{flex:1 1 13vw;min-width:min(100%,140px);display:flex;flex-direction:column;gap:.1em;background:var(--panel);border:.3vw solid transparent;border-radius:.6vw;padding:.5vw 1vw;text-align:left}
-.team .nm{font-weight:700;font-size:clamp(14px,1.8vw,34px);overflow-wrap:anywhere}
-.team .sc{font-weight:900;font-size:clamp(26px,3.6vw,70px);font-variant-numeric:tabular-nums;line-height:1}
-.team .tg{font-size:clamp(11px,1.1vw,20px);font-weight:700;color:var(--muted);min-height:1.2em}
+.scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:.5vw;border-top:.2vw solid var(--ink);padding-top:.6vw}
+.team{display:flex;flex-wrap:wrap;align-items:center;gap:.4vw;background:var(--panel);border:.2vw solid transparent;border-radius:.4vw;padding:.25vw .7vw;text-align:left;min-width:0}
+.team .kn{flex:none;display:grid;place-items:center;width:1.5em;height:1.5em;background:var(--ink);color:#fff;border-radius:.25em;font-weight:900;font-size:clamp(11px,1.1vw,20px)}
+.team .nm{flex:1;min-width:0;font-weight:700;font-size:clamp(12px,1.2vw,24px);line-height:1.05;overflow-wrap:anywhere}
+.team .sc{font-weight:900;font-size:clamp(18px,2.1vw,40px);font-variant-numeric:tabular-nums;line-height:1}
 .team.pick{cursor:pointer;border-color:var(--ink);background:#fff}
 .team.sel{background:var(--amber);border-color:var(--ink)}
 .team.used{opacity:.45}
@@ -317,9 +317,8 @@ function scoreHTML(){
     if(choose&&!used)cls.push('pick');
     if(choose&&S.sel===i)cls.push('sel');
     if(choose&&used)cls.push('used');
-    const tag=choose&&used?'sudah menjawab':(choose&&S.sel===i?'menjawab':(choose?'tekan ' +(i+1):''));
     return `<div class="${cls.join(' ')}" ${choose&&!used?`data-act="team" data-i="${i}"`:''}>
-      <span class="nm">${esc(t.name)}</span><span class="sc">${t.score}</span><span class="tg">${tag}</span>
+      <span class="nm">${esc(t.name)}</span><span class="sc">${t.score}</span>
       ${S.edit?`<span class="adj"><button data-act="adj" data-i="${i}" data-d="-5">−5</button><button data-act="adj" data-i="${i}" data-d="5">+5</button></span>`:''}</div>`}).join('')}</footer>`;
 }
 function optsHTML(reveal){
@@ -383,7 +382,7 @@ function fitAll(){
   }
   const op=document.querySelector('.opts');
   if(op){
-    let s=Math.min(innerWidth*.036,innerHeight*.07,68);
+    let s=Math.min(innerWidth*.045,innerHeight*.09,90);
     op.style.setProperty('--of',s+'px');
     while(op.scrollHeight>op.clientHeight+1&&s>13){s-=2;op.style.setProperty('--of',s+'px')}
   }
